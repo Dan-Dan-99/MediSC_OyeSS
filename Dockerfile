@@ -2,7 +2,7 @@ FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
 
 RUN apt-get update -y && \
     apt-get upgrade -y && \
-    apt-get install vim wget curl git ffmpeg gcc-8 g++-8 -y
+    apt-get install vim wget curl git gcc-8 g++-8 -y
 
 RUN mkdir OyeSS
 
@@ -10,6 +10,6 @@ WORKDIR /OyeSS
 
 COPY requirements.txt .
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-ENTRYPOINT ["/bin/bash", "-c", "sleep 500"]
+ENTRYPOINT ["tail", "-f", "/dev/null"]
