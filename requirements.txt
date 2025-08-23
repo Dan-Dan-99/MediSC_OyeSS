@@ -1,17 +1,4 @@
-pillow
-gdown
-einops
-numpy
-scipy
-scikit-learn
-openpyxl
-safetensors
-matplotlib
-opencv-python
-transformers
-pandas
-ultralytics
-timm
-wandb
-tqdm
-flwr[simulations]
+-r requirements/build.txt
+-r requirements/runtime.txt
+-r requirements/tests.txt
+-r requirements/optional.txt
