@@ -8,19 +8,22 @@ from mmengine.config import Config, DictAction
 from mmengine.hooks import Hook
 from mmengine.runner import Runner
 
+from extract_kp_to_txt import process_multiple_items
 
 def parse_args():
     parser = argparse.ArgumentParser(
         description='MMPose test (and eval) model')
     parser.add_argument('config', help='test config file path')
     parser.add_argument('checkpoint', help='checkpoint file')
-    parser.add_argument(
-        '--work-dir', help='the directory to save evaluation results')
+    
+    parser.add_argument('--config2', help='second model config file path')
+    parser.add_argument('--checkpoint2', help='second model checkpoint file')
+    parser.add_argument('--work-dir', help='the directory to save evaluation results')
     parser.add_argument('--out', help='the file to save metric results.')
-    parser.add_argument(
-        '--dump',
-        type=str,
-        help='dump predictions to a pickle file for offline evaluation')
+    parser.add_argument('--dump', type=str, help='dump predictions to a pickle file for offline evaluation')
+    parser.add_argument('--csv-out', action='store_true', help='save predictions as CSV files')
+    parser.add_argument('--csv-decimal', type=int, default=4, help='decimal places for CSV output (default: 4)')
+
     parser.add_argument(
         '--cfg-options',
         nargs='+',
@@ -137,29 +140,104 @@ def merge_args(cfg, args):
 
     return cfg
 
+class MultiModelCSVHook(Hook):
+    """다중 모델 CSV 저장을 위한 Hook"""
+    
+    def __init__(self, decimal_places=4):
+        self.decimal_places = decimal_places
+        self.model1_predictions = []
+        self.model2_predictions = []
+        self.current_model = 1
+    
+    def set_current_model(self, model_num):
+        """현재 처리 중인 모델 번호 설정"""
+        self.current_model = model_num
+    
+    def after_test_iter(self, runner, batch_idx, data_batch=None, outputs=None):
+        """각 테스트 iteration 후에 예측 결과 수집"""
+        if outputs is not None:
+            for output in outputs:
+                if hasattr(output, 'pred_instances'):
+                    if self.current_model == 1:
+                        self.model1_predictions.append(output)
+                    else:
+                        self.model2_predictions.append(output)
+    
+    def after_test_epoch(self, runner, metrics=None):
+        """테스트 완료 후 CSV 저장 (모델2 완료 시에만)"""
+        if self.current_model == 2 and self.model1_predictions and self.model2_predictions:
+            try:
+                total_preds = len(self.model1_predictions) + len(self.model2_predictions)
+                print(f"Saving {total_preds} predictions from 2 models to CSV...")
+                
+                created_files = process_multiple_items(
+                    [self.model1_predictions, 
+                    self.model2_predictions]
+                )
+                print(f"CSV files created: {created_files}")
+            except Exception as e:
+                print(f"Error saving CSV: {e}")
+                import traceback
+                traceback.print_exc()
 
 def main():
     args = parse_args()
 
     # load config
-    cfg = Config.fromfile(args.config)
-    cfg = merge_args(cfg, args)
+    cfg1 = Config.fromfile(args.config)
+    cfg1 = merge_args(cfg1, args)
 
-    # build the runner from config
-    runner = Runner.from_cfg(cfg)
+    # CSV Hook 초기화 (두 모델 공용)
+    csv_hook = None
+    if args.csv_out:
+        csv_hook = MultiModelCSVHook(decimal_places=args.csv_decimal)
+        print(f"Multi-model CSV output enabled with {args.csv_decimal} decimal places")
+    
+    # 첫 번째 모델 실행
+    print("Running inference with Model 1...")
+    runner1 = Runner.from_cfg(cfg1)
+    
+    if csv_hook:
+        csv_hook.set_current_model(1)
+        runner1.register_hook(csv_hook, 'LOWEST')
+    
+    runner1.test()
+    
+    # 두 번째 모델이 있는 경우
+    if args.config2 and args.checkpoint2:
+        print("Running inference with Model 2...")
+        cfg2 = Config.fromfile(args.config2)
+        cfg2.launcher = args.launcher
+        cfg2.load_from = args.checkpoint2
+        cfg2.work_dir = cfg1.work_dir  # 같은 작업 디렉토리 사용
+        
+        if args.dump is not None:
+            dump2_path = args.dump.replace('.pkl', '_model2.pkl')
+            dump_metric2 = dict(type='DumpResults', out_file_path=dump2_path)
+            if isinstance(cfg2.test_evaluator, (list, tuple)):
+                cfg2.test_evaluator = [*cfg2.test_evaluator, dump_metric2]
+            else:
+                cfg2.test_evaluator = [cfg2.test_evaluator, dump_metric2]
 
-    if args.out:
-
-        class SaveMetricHook(Hook):
-
-            def after_test_epoch(self, _, metrics=None):
-                if metrics is not None:
-                    mmengine.dump(metrics, args.out)
-
-        runner.register_hook(SaveMetricHook(), 'LOWEST')
-
-    # start testing
-    runner.test()
+        runner2 = Runner.from_cfg(cfg2)
+        
+        if csv_hook:
+            csv_hook.set_current_model(2)
+            runner2.register_hook(csv_hook, 'LOWEST')
+        
+        runner2.test()
+    else:
+        # 단일 모델인 경우 바로 CSV 저장
+        if csv_hook and csv_hook.model1_predictions:
+            try:
+                print(f"Saving {len(csv_hook.model1_predictions)} predictions from single model to CSV...")
+                created_files = process_multiple_items(
+                    csv_hook.model1_predictions,
+                    decimal_places=csv_hook.decimal_places
+                )
+                print(f"CSV files created: {created_files}")
+            except Exception as e:
+                print(f"Error saving CSV: {e}")
 
 
 if __name__ == '__main__':
