@@ -3,7 +3,7 @@ import argparse
 import os
 import os.path as osp
 
-import mmengine
+import numpy as np
 from mmengine.config import Config, DictAction
 from mmengine.hooks import Hook
 from mmengine.runner import Runner
@@ -158,21 +158,42 @@ class MultiModelCSVHook(Hook):
         if outputs is not None:
             for output in outputs:
                 if hasattr(output, 'pred_instances'):
+                    import torch
+                    from types import SimpleNamespace
+                    
+                    # 안전한 numpy 변환 함수
+                    def to_numpy(data):
+                        if isinstance(data, torch.Tensor):
+                            return data.cpu().numpy()
+                        elif isinstance(data, np.ndarray):
+                            return data
+                        else:
+                            return np.array(data)
+                    
+                    # 딕셔너리를 객체로 변환
+                    converted_data = SimpleNamespace()
+                    converted_data.img_path = getattr(output, 'img_path', '')
+                    converted_data.category_id = getattr(output, 'category_id', 0)
+                    
+                    # pred_instances도 객체로 변환
+                    pred_instances = SimpleNamespace()
+                    pred_instances.keypoints = to_numpy(output.pred_instances.keypoints)
+                    pred_instances.keypoint_scores = to_numpy(output.pred_instances.keypoint_scores)
+                    converted_data.pred_instances = pred_instances
+                    
                     if self.current_model == 1:
-                        self.model1_predictions.append(output)
+                        self.model1_predictions.append(converted_data)
                     else:
-                        self.model2_predictions.append(output)
+                        self.model2_predictions.append(converted_data)
     
     def after_test_epoch(self, runner, metrics=None):
-        """테스트 완료 후 CSV 저장 (모델2 완료 시에만)"""
+        """테스트 완료 후 CSV 저장"""
         if self.current_model == 2 and self.model1_predictions and self.model2_predictions:
             try:
                 total_preds = len(self.model1_predictions) + len(self.model2_predictions)
                 print(f"Saving {total_preds} predictions from 2 models to CSV...")
-                
                 created_files = process_multiple_items(
-                    [self.model1_predictions, 
-                    self.model2_predictions]
+                    [self.model1_predictions, self.model2_predictions]
                 )
                 print(f"CSV files created: {created_files}")
             except Exception as e:
@@ -211,13 +232,13 @@ def main():
         cfg2.load_from = args.checkpoint2
         cfg2.work_dir = cfg1.work_dir  # 같은 작업 디렉토리 사용
         
-        if args.dump is not None:
-            dump2_path = args.dump.replace('.pkl', '_model2.pkl')
-            dump_metric2 = dict(type='DumpResults', out_file_path=dump2_path)
-            if isinstance(cfg2.test_evaluator, (list, tuple)):
-                cfg2.test_evaluator = [*cfg2.test_evaluator, dump_metric2]
-            else:
-                cfg2.test_evaluator = [cfg2.test_evaluator, dump_metric2]
+        if args.show_dir is not None:
+            cfg2.default_hooks.visualization.enable = True
+            cfg2.default_hooks.visualization.show = args.show
+            cfg2.default_hooks.visualization.out_dir = args.show_dir + '_model2'  # 구분을 위해 다른 폴더명
+            cfg2.default_hooks.visualization.interval = args.interval
+            if args.show:
+                cfg2.default_hooks.visualization.wait_time = args.wait_time
 
         runner2 = Runner.from_cfg(cfg2)
         
@@ -233,7 +254,7 @@ def main():
                 print(f"Saving {len(csv_hook.model1_predictions)} predictions from single model to CSV...")
                 created_files = process_multiple_items(
                     csv_hook.model1_predictions,
-                    decimal_places=csv_hook.decimal_places
+                    #decimal_places=csv_hook.decimal_places
                 )
                 print(f"CSV files created: {created_files}")
             except Exception as e:

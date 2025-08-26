@@ -23,28 +23,30 @@ def process_results(data):
     """처리된 딕셔너리 리스트를 기반으로 CSV 데이터를 구조화합니다."""
     results_by_image_id = {}
     for record in data:
-        # [수정] record.img_path -> record.get('img_path')로 변경
-        img_path = record.get('img_path')
-        if not img_path: continue
+        # Check if the record has the 'img_path' attribute
+        if not hasattr(record, 'img_path'): continue
+        
+        img_path = record.img_path
         image_id, frame = parse_img_path(img_path)
 
-        # [수정] hasattr(record, 'pred_instances') -> 'pred_instances' in record 로 변경
-        if 'pred_instances' in record and record['pred_instances']:
-            pred_instances = record['pred_instances']
-            keypoints_all = pred_instances.get('keypoints')
-            scores_all = pred_instances.get('keypoint_scores')
+        # Access attributes directly using dot notation
+        if hasattr(record, 'pred_instances') and record.pred_instances:
+            pred_instances = record.pred_instances
+            
+            # Access attributes within the 'pred_instances' object
+            keypoints_all = pred_instances.keypoints
+            scores_all = pred_instances.keypoint_scores
 
             if keypoints_all is None or scores_all is None: continue
             
-            # [수정] record.category_id -> record.get('category_id') 로 변경
-            class_id_raw = record.get('category_id')
+            # Access the category_id attribute
+            class_id_raw = record.category_id
             class_id = class_id_raw
             if isinstance(class_id_raw, np.ndarray):
                 class_id = class_id_raw.item() if class_id_raw.size == 1 else class_id_raw
 
             num_instances = keypoints_all.shape[0]
             for i in range(num_instances):
-                # category_id가 배열일 경우 인스턴스별 id 할당
                 instance_class_id = class_id[i] if isinstance(class_id, np.ndarray) and class_id.size > 1 else class_id
                 
                 row = {
@@ -122,9 +124,16 @@ def process_multiple_items(data_items):
                     data_list = eval(item)
             elif isinstance(item, list):
                 data_list = item
+            elif hasattr(item, '__iter__') and not isinstance(item, str):  # SimpleNamespace 객체들의 리스트 처리
+                data_list = list(item)
             else:
-                print(f"처리할 수 없는 데이터 타입입니다: {type(item)}. 건너뜁니다.")
-                continue
+                from types import SimpleNamespace
+                if isinstance(item, SimpleNamespace):
+                    data_list = [item]
+                else:
+                    print(f"처리할 수 없는 데이터 타입입니다: {type(item)}. 건너뜁니다.")
+                    continue
+                
             combined_data.extend(data_list)
         
         processed_data = process_results(combined_data)
