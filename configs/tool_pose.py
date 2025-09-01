@@ -1,5 +1,5 @@
 # 1. General Configuration
-_base_ = ['_base_/default_runtime.py']
+_base_ = ['_base_/default_runtime_pose.py']
 
 default_scope = 'mmpose'
 
@@ -45,7 +45,13 @@ dataset_info = dict(
     skeleton_info={},
     num_keypoints=3,
     joint_weights=[1.0] * 3,
-    sigmas=[0.025] * 3
+    sigmas=[0.025] * 3,
+    keypoint_colors=[
+        [255, 0, 0],      # Left - 빨강
+        [255, 128, 0],    # Right - 주황  
+        [255, 255, 0]     # Joint - 노랑
+    ],
+    skeleton_colors=[]
 )
 
 # Data pipeline
@@ -77,7 +83,7 @@ val_pipeline = [
 # Dataloader 설정
 train_dataloader = dict(
     batch_size=16,
-    num_workers=1,
+    num_workers=0,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
     dataset=dict(
@@ -92,7 +98,7 @@ train_dataloader = dict(
 
 val_dataloader = dict(
     batch_size=16,
-    num_workers=1,
+    num_workers=0,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False, round_up=False),
@@ -193,7 +199,7 @@ test_evaluator = val_evaluator
 
 # WandB 로깅 설정 추가
 visualizer = dict(
-    type='Visualizer',
+    type='PoseLocalVisualizer',
     vis_backends=[
         dict(
             type='WandbVisBackend',
@@ -203,6 +209,8 @@ visualizer = dict(
                     allow_val_change=True  # 값 변경 허용
                 )
             )
-        )
-    ]
+        ),
+        dict(type='LocalVisBackend')
+    ],
+    name='visualizer'
 )
