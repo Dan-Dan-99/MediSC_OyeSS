@@ -4,9 +4,9 @@ max_epochs = 420
 stage2_num_epochs = 30
 base_lr = 4e-3
 
-train_cfg = dict(by_epoch = True, max_epochs = max_epochs, val_interval = 10)
-val_cfg = dict()
-test_cfg = dict()
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=100, val_interval=10)
+val_cfg = dict(type='ValLoop')
+test_cfg = dict(type='TestLoop')
 randomness = dict(seed = 21)
 
 default_scope = 'mmpose'
@@ -377,5 +377,6 @@ visualizer = dict(
             )
         ),
         dict(type='LocalVisBackend')
-    ]
+    ],
+    name='visualizer'
 )

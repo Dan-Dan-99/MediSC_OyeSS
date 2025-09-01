@@ -104,7 +104,7 @@ def main():
     parser.add_argument(
         '--det-cat-id',
         type=int,
-        default=0,
+        default=[0,1],
         help='Category id for bounding box detection model')
     parser.add_argument(
         '--bbox-thr',

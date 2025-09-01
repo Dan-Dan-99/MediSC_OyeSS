@@ -1,0 +1,185 @@
+{
+	"meta_info": {
+		"dataset_name": "hands_only_dataset",
+		"num_keypoints": 6,
+		"keypoint_id2name": {
+			"0": "Thumb",
+			"1": "Middle",
+			"2": "Index",
+			"3": "Ring",
+			"4": "Pinky",
+			"5": "Back_of_hand"
+		},
+		"keypoint_name2id": {
+			"Thumb": 0,
+			"Middle": 1,
+			"Index": 2,
+			"Ring": 3,
+			"Pinky": 4,
+			"Back_of_hand": 5
+		},
+		"upper_body_ids": [],
+		"lower_body_ids": [],
+		"flip_indices": [
+			0,
+			1,
+			2,
+			3,
+			4,
+			5
+		],
+		"flip_pairs": [],
+		"keypoint_colors": {
+			"__ndarray__": [
+				[
+					255,
+					0,
+					0
+				],
+				[
+					255,
+					165,
+					0
+				],
+				[
+					255,
+					255,
+					0
+				],
+				[
+					0,
+					128,
+					0
+				],
+				[
+					128,
+					0,
+					128
+				],
+				[
+					128,
+					0,
+					128
+				]
+			],
+			"dtype": "uint8",
+			"shape": [
+				6,
+				3
+			],
+			"Corder": true
+		},
+		"num_skeleton_links": 0,
+		"skeleton_links": [],
+		"skeleton_link_colors": {
+			"__ndarray__": [],
+			"dtype": "uint8",
+			"shape": [
+				0
+			]
+		},
+		"dataset_keypoint_weights": {
+			"__ndarray__": [
+				1.0,
+				1.0,
+				1.0,
+				1.0,
+				1.0,
+				1.0
+			],
+			"dtype": "float32",
+			"shape": [
+				6
+			]
+		},
+		"sigmas": {
+			"__ndarray__": [
+				0.02500000037252903,
+				0.02500000037252903,
+				0.02500000037252903,
+				0.02500000037252903,
+				0.02500000037252903,
+				0.02500000037252903
+			],
+			"dtype": "float32",
+			"shape": [
+				6
+			]
+		},
+		"CLASSES": [
+			{
+				"id": 0,
+				"name": "Left Hand",
+				"supercategory": "object",
+				"keypoints": [
+					"thumb",
+					"middle_finger",
+					"index_finger",
+					"ring_finger",
+					"pinky_finger",
+					"back_of_hand"
+				]
+			},
+			{
+				"id": 1,
+				"name": "Right Hand",
+				"supercategory": "object",
+				"keypoints": [
+					"thumb",
+					"middle_finger",
+					"index_finger",
+					"ring_finger",
+					"pinky_finger",
+					"back_of_hand"
+				]
+			}
+		]
+	},
+	"instance_info": [
+		{
+			"keypoints": [
+				[
+					1321.1102294921875,
+					435.56573486328125
+				],
+				[
+					1358.9935302734375,
+					539.7451171875
+				],
+				[
+					1434.7603759765625,
+					501.8616943359375
+				],
+				[
+					1519.998046875,
+					506.5971374511719
+				],
+				[
+					1638.3837890625,
+					463.978271484375
+				],
+				[
+					1756.7694091796875,
+					710.220458984375
+				]
+			],
+			"keypoint_scores": [
+				0.28288018703460693,
+				0.2745324969291687,
+				0.5900241732597351,
+				0.6202026605606079,
+				0.7245503664016724,
+				0.27312037348747253
+			],
+			"bbox": [
+				[
+					1289.3828125,
+					445.89208984375,
+					1774.29052734375,
+					695.15869140625
+				]
+			],
+			"bbox_score": 1.0
+		}
+	]
+}
