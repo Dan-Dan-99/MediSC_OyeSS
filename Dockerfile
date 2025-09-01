@@ -23,7 +23,7 @@ RUN pip install gdown
 ARG GDRIVE_FOLDER_URL="https://drive.google.com/drive/folders/16bQw6r2m9EUsMAh5wwy8d9GuM4NL9BSI?usp=sharing"
 RUN gdown --folder --fuzzy "$GDRIVE_FOLDER_URL" -O /workspace/MediSC_OyeSS/configs
 
-RUN mv Process_SkillEval.sh /usr/local/bin/Process_skillEval.sh
+RUN mv Process_skillEval.sh /usr/local/bin/Process_skillEval.sh
 RUN chmod +777 /usr/local/bin/Process_skillEval.sh
 
 ENTRYPOINT ["tail", "-f", "/dev/null"]
