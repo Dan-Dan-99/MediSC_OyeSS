@@ -2,28 +2,29 @@ FROM pytorch/pytorch:2.4.0-cuda11.8-cudnn9-devel
 
 RUN apt-get update -y && \
     apt-get upgrade -y && \
-    apt-get install vim wget curl ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 libgl1-mesa-glx git gcc-8 g++-8 -y && \
+    apt-get install vim wget curl ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 libgl1-mesa-glx git -y && \
     apt-get clean
 
 RUN mkdir input output
 
+RUN git clone -b devel-kp https://github.com/amuck667/TrackEval.git
+RUN git clone -b MMPose https://github.com/Dan-Dan-99/MediSC_OyeSS.git
 
-RUN git clone https://github.com/amuck667/TrackEval.git
 WORKDIR TrackEval
-RUN git switch devel-kp \
-    mkdir data data/gt data/trackers
+RUN mkdir data data/gt data/trackers
 
-RUN git clone https://github.com/Dan-Dan-99/MediSC_OyeSS.git
 WORKDIR ../MediSC_OyeSS
-RUN git switch MMPose
-
-RUN pip install torch==2.4.1 torchvision==2.4.1 torchaudio==0.19.1 --index-url https://download.pytorch.org/whl/cu118
-RUN pip install -U mmengine
-RUN mim install mmcv==2.1.0 mmdet>=3.1.0
+RUN pip install -U torch==2.4.1 torchaudio==2.4.1 torchvision==0.19.1 --index-url https://download.pytorch.org/whl/cu118
+RUN pip install openmim
+RUN mim install -U mmengine mmcv==2.1.0 mmdet>=3.1.0
 RUN pip install -r requirements.txt
-RUN pip install -v -e .
+
+RUN pip install gdown
+ARG GDRIVE_FOLDER_URL="https://drive.google.com/drive/folders/16bQw6r2m9EUsMAh5wwy8d9GuM4NL9BSI?usp=sharing"
+RUN gdown --folder --fuzzy "$GDRIVE_FOLDER_URL" -O /MediSC_OyeSS/configs
 
 RUN mv Process_SkillEval.sh /usr/local/bin/Process_SkillEval.sh
+RUN chmod +777 /usr/local/bin/Process_SkillEval.sh
 
-ENTRYPOINT ["tail", "-f", "/dev/null"]
-# RUN ["bash", "/usr/local/bin/Process_SkillEval.sh"]
+#ENTRYPOINT ["tail", "-f", "/dev/null"]
+CMD ["bash"]

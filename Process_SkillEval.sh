@@ -1,6 +1,7 @@
 #!/bin/bash
 
 IMAGE_DIR="/input"
+mv /output/gt/* /TrackEval/data/gt
 
 process_image()
 {
