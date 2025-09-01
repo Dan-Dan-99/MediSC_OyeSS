@@ -26,5 +26,5 @@ RUN gdown --folder --fuzzy "$GDRIVE_FOLDER_URL" -O /MediSC_OyeSS/configs
 RUN mv Process_SkillEval.sh /usr/local/bin/Process_SkillEval.sh
 RUN chmod +777 /usr/local/bin/Process_SkillEval.sh
 
-#ENTRYPOINT ["tail", "-f", "/dev/null"]
-CMD ["bash"]
+ENTRYPOINT ["tail", "-f", "/dev/null"]
+#CMD ["bash"]
