@@ -45,13 +45,7 @@ dataset_info = dict(
     skeleton_info={},
     num_keypoints=3,
     joint_weights=[1.0] * 3,
-    sigmas=[0.025] * 3,
-    keypoint_colors=[
-        [255, 0, 0],      # Left - 빨강
-        [255, 128, 0],    # Right - 주황  
-        [255, 255, 0]     # Joint - 노랑
-    ],
-    skeleton_colors=[]
+    sigmas=[0.025] * 3
 )
 
 # Data pipeline
@@ -200,17 +194,6 @@ test_evaluator = val_evaluator
 # WandB 로깅 설정 추가
 visualizer = dict(
     type='PoseLocalVisualizer',
-    vis_backends=[
-        dict(
-            type='WandbVisBackend',
-            init_kwargs=dict(
-                project='oss_task3',
-                settings=dict(
-                    allow_val_change=True  # 값 변경 허용
-                )
-            )
-        ),
-        dict(type='LocalVisBackend')
-    ],
+    vis_backends=vis_backends,
     name='visualizer'
 )

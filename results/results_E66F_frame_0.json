@@ -1,0 +1,154 @@
+{
+	"meta_info": {
+		"dataset_name": "surgical_tools",
+		"num_keypoints": 3,
+		"keypoint_id2name": {
+			"0": "Left",
+			"1": "Right",
+			"2": "Joint"
+		},
+		"keypoint_name2id": {
+			"Left": 0,
+			"Right": 1,
+			"Joint": 2
+		},
+		"upper_body_ids": [],
+		"lower_body_ids": [],
+		"flip_indices": [
+			0,
+			1,
+			2
+		],
+		"flip_pairs": [],
+		"keypoint_colors": {
+			"__ndarray__": [
+				[
+					255,
+					0,
+					0
+				],
+				[
+					255,
+					128,
+					0
+				],
+				[
+					255,
+					255,
+					0
+				]
+			],
+			"dtype": "uint8",
+			"shape": [
+				3,
+				3
+			],
+			"Corder": true
+		},
+		"num_skeleton_links": 0,
+		"skeleton_links": [],
+		"skeleton_link_colors": {
+			"__ndarray__": [],
+			"dtype": "uint8",
+			"shape": [
+				0
+			]
+		},
+		"dataset_keypoint_weights": {
+			"__ndarray__": [
+				1.0,
+				1.0,
+				1.0
+			],
+			"dtype": "float32",
+			"shape": [
+				3
+			]
+		},
+		"sigmas": {
+			"__ndarray__": [
+				0.02500000037252903,
+				0.02500000037252903,
+				0.02500000037252903
+			],
+			"dtype": "float32",
+			"shape": [
+				3
+			]
+		},
+		"CLASSES": [
+			{
+				"id": 2,
+				"name": "Scissors",
+				"supercategory": "object",
+				"keypoints": [
+					"left_sharp_point",
+					"right_broad_point",
+					"joint"
+				]
+			},
+			{
+				"id": 3,
+				"name": "Tweezers",
+				"supercategory": "object",
+				"keypoints": [
+					"left_with_nub",
+					"right_with_hole",
+					"nub"
+				]
+			},
+			{
+				"id": 4,
+				"name": "Needle Holder",
+				"supercategory": "object",
+				"keypoints": [
+					"left_tip",
+					"right_tip",
+					"joint"
+				]
+			},
+			{
+				"id": 5,
+				"name": "Needle",
+				"supercategory": "object",
+				"keypoints": [
+					"left_end",
+					"right_tip",
+					"middle"
+				]
+			}
+		]
+	},
+	"instance_info": [
+		{
+			"keypoints": [
+				[
+					367.43896484375,
+					123.83224487304688
+				],
+				[
+					454.84405517578125,
+					121.70040893554688
+				],
+				[
+					437.7893981933594,
+					337.0153503417969
+				]
+			],
+			"keypoint_scores": [
+				0.859225332736969,
+				0.942594587802887,
+				0.976432740688324
+			],
+			"bbox": [
+				[
+					367.6797180175781,
+					122.33997344970703,
+					458.8669738769531,
+					340.63946533203125
+				]
+			],
+			"bbox_score": 1.0
+		}
+	]
+}
