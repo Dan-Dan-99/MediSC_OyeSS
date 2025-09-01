@@ -18,6 +18,8 @@ RUN pip install -U torch==2.4.1 torchaudio==2.4.1 torchvision==0.19.1 --index-ur
 RUN pip install openmim
 RUN mim install -U mmengine mmcv==2.1.0 mmdet>=3.1.0
 RUN pip install -r requirements.txt
+RUN mim install mmpose>=1.1.0
+
 
 RUN pip install gdown
 ARG GDRIVE_FOLDER_URL="https://drive.google.com/drive/folders/16bQw6r2m9EUsMAh5wwy8d9GuM4NL9BSI?usp=sharing"
@@ -26,5 +28,5 @@ RUN gdown --folder --fuzzy "$GDRIVE_FOLDER_URL" -O /workspace/MediSC_OyeSS/confi
 RUN mv Process_skillEval.sh /usr/local/bin/Process_skillEval.sh
 RUN chmod +777 /usr/local/bin/Process_skillEval.sh
 
-ENTRYPOINT ["tail", "-f", "/dev/null"]
-#CMD ["bash"]
+# ENTRYPOINT ["tail", "-f", "/dev/null"]
+CMD ["bash"]
