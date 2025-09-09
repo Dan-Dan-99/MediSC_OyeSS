@@ -72,6 +72,6 @@ if __name__ == "__main__" :
     # postprocess_multiple_frames(base_dir, "A66G", output_dir)
 
 base_dir = '/MediSC_OyeSS/results'
-output_dir = '/TrackEval/data/trackers'
+output_dir = '/output'
 
 process_all_pids(base_dir, output_dir)
