@@ -72,6 +72,6 @@ def process_all_pids(base_dir, output_dir) :
 #     postprocess_multiple_frames(base_dir, "A66G", output_dir)
 
 base_dir = '/MediSC_OyeSS/results'
-output_dir = '/output'
+output_dir = '/output/trackers'
 
 process_all_pids(base_dir, output_dir)
